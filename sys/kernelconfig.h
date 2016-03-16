@@ -1,0 +1,13 @@
+#ifndef KERNELCONFIG_H
+#define KERNELCONFIG_H
+
+#define MESSAGE_STRING_SIZE (512+256)
+#define SIGNAL_OK 0
+#define SIGNAL_FAIL -1
+
+#define SERVICE_REGISTER 1
+#define SERVICE_REQUEST 2
+
+#define CLOCKS_PER_SEC 1000
+
+#endif
