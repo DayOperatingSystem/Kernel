@@ -2,6 +2,7 @@
 #include <types.h>
 #include <debug.h>
 #include <heap.h>
+#include <string.h>
 
 // Kernel Kontext
 vmm_context_t* kernel_context = NULL;
@@ -30,6 +31,44 @@ vmm_context_t* create_context()
 	}
 	
 	return context;
+}
+
+vmm_context_t* vmm_clone_context(vmm_context_t* template)
+{
+	char* buffer = pmm_alloc(PAGEPOOL_START, PAGEPOOL_END);
+	vmm_context_t* retval = CreateUsermodeContext(0);
+
+	int i = 0;
+	uintptr_t currpage = 0x0;
+	
+	// Free everything else
+	for (; i < 1024; i++)
+	{
+		if (template->pagedir[i] & 0x1)
+		{
+			uintptr_t* pagetable = (uintptr_t*)(template->pagedir[i] & ~0xFFF);
+
+			for (int j = 0; j < 1024; j++)
+			{
+				uintptr_t entry = pagetable[j] & ~0xFFF;
+				if (pagetable[j] & VMM_USED && pagetable[j] & VMM_ALLOCATED)
+				{
+					vmm_alloc(retval, currpage, PAGESIZE);
+
+					memcpy(buffer, (void*) currpage, PAGESIZE);
+					activate_memory_context(retval);
+					memcpy((void*) currpage, buffer, PAGESIZE);
+					activate_memory_context(template);
+				}
+				currpage += PAGESIZE;
+			}
+		}
+		else
+		{
+			currpage += 1024*PAGESIZE;
+		}
+	}
+	return retval;
 }
 
 void destroy_context(vmm_context_t* context)

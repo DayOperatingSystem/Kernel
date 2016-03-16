@@ -147,6 +147,32 @@ process_t* CreateUserProcess(void (*entry)(), vmm_context_t* context)
 	return process;
 }
 
+void PseudoFork(process_t* parent)
+{
+	uint8_t* stack = kmalloc(4096);
+	process_t* child = kmalloc(sizeof(process_t));
+
+	memcpy(stack, parent->stack, 4096);
+	child->stack = stack;
+	child->state = (void*) (stack + 4096 - sizeof(struct cpu));
+
+	child->next = first_process;
+	first_process = child;
+	
+	child->parent = parent->pid;
+	child->pid = num_proc;
+	child->context = vmm_clone_context(parent->context);
+	
+	child->messages.num_messages = 0;
+	child->messages.first = NULL;
+	child->messages.last = NULL;
+
+	child->state->eax = 0;
+	parent->state->eax = child->pid;
+	
+	num_proc++;
+}
+
 struct cpu* Schedule(struct cpu* cpu_old)
 {
 	unsigned int oldPid = -1;

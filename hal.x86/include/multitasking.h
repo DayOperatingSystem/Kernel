@@ -64,6 +64,7 @@ void InitMultitasking();
 struct cpu* Schedule(struct cpu* old_cpu);
 process_t* CreateUserProcess(void (*entry)(), vmm_context_t* context);
 process_t* GetProcessByPid(uint32_t pid);
+void PseudoFork(process_t* parent);
 
 struct cpu* KillCurrentProcess();
 void KillProcess(process_t* process);

@@ -32,6 +32,7 @@ typedef struct __attribute__((packed))
 #define SYSCALL_READ_PORT 18
 #define SYSCALL_GET_PID 19
 #define SYSCALL_GET_PARENT_PID 20
+#define SYSCALL_FORK 21
 
 // Platform specific!
 #define SYSCALL_BIOS_INT 16

@@ -41,5 +41,6 @@ void destroy_context(vmm_context_t* context);
 void map_page(vmm_context_t* context, uintptr_t virt, uintptr_t phys, uint8_t userspace, uint8_t allocated);
 void enable_paging(int value);
 void map_range(vmm_context_t* context, uintptr_t start_virt, uintptr_t start_phys, uint32_t size, uint32_t userspace);
+vmm_context_t* vmm_clone_context(vmm_context_t* template);
 
 #endif

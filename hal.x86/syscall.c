@@ -317,6 +317,10 @@ struct cpu* Syscall(struct cpu* cpu_old)
 		cpu_old->eax = current_process->parent;
 	break;
 
+	case SYSCALL_FORK:
+		PseudoFork(current_process);
+	break;
+	
 	default: DebugPrintf("[ SYSCALL ] Unknown syscall 0x%x from %d\n", cpu_old->eax, current_process->pid);
 	}
 	
