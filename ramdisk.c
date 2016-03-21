@@ -26,7 +26,7 @@ typedef struct
 
 static tar_header_t** files;
 static tar_header_t* first_file;
-static uint32_t fileno = 0;
+static uint32_t filecount = 0;
 
 static uint32_t get_size(const char* in)
 {
@@ -95,7 +95,7 @@ uintptr_t RamDiskFileContent(const char* name)
 	}
 
 	int i;
-	for(i = 0; i < fileno; i++)
+	for(i = 0; i < filecount; i++)
 	{
 		if(!strcmp(name, files[i]->filename))
 		{
@@ -116,7 +116,7 @@ tar_header_t* GetRamDiskFile(const char* name)
 	}
 
 	int i;
-	for(i = 0; i < fileno; i++)
+	for(i = 0; i < filecount; i++)
 	{
 		if(!strcmp(name, files[i]->filename))
 		{
@@ -185,13 +185,13 @@ void InitRamdisk(uintptr_t addr)
 	DebugPrintf("[ RAMDISK ] RAM-Disk at 0x%x\n", addr);
 	
 	first_file = (tar_header_t*) addr;//(addr + 512);
-	fileno = count_files();
+	filecount = count_files();
 	
-	assert(fileno != 0);
+	assert(filecount != 0);
 	
-	DebugPrintf("[ RAMDISK ] RAM-Disk contains %d files\n", fileno);
+	DebugPrintf("[ RAMDISK ] RAM-Disk contains %d files\n", filecount);
 	
-	files = (tar_header_t**) kmalloc(sizeof(tar_header_t*) * fileno);
+	files = (tar_header_t**) kmalloc(sizeof(tar_header_t*) * filecount);
 	add_files_to_list();
 }
 
@@ -292,7 +292,7 @@ void ramdisk_process()
 				// Find first entry of the directory
 				int i;
 				size_t dirname_len = strlen(files[i]->filename);
-				for(i = 0; i < fileno; i++)
+				for(i = 0; i < filecount; i++)
 				{
 					DebugPrintf("Comparing %s to %s\n", files[i]->filename + 1, rq->path);
 					if(!strncmp(files[i]->filename + 1, rq->path, dirname_len))
@@ -314,7 +314,7 @@ void ramdisk_process()
 			
 			case VFS_SIGNAL_READ_DIR: {
 				
-				if(rq->param < 0 || rq->param >= fileno)
+				if(rq->param < 0 || rq->param >= filecount)
 				{
 					msg.signal = SIGNAL_FAIL;
 					send_message(&msg, msg.sender);
