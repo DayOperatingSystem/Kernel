@@ -22,7 +22,11 @@ mboot:
     dd kernel_end
     dd start
 
-; Ruft Init() auf
+SECTION .data
+value_37F dw 0x37F
+value_37E dw 0x37E
+value_37A dw 0x37A
+
 
 SECTION .text
 
@@ -36,6 +40,12 @@ start:
 [extern setup_stack_chk]
 
 main:
+
+	; Initialize FPU
+	fldcw [value_37F]
+	fldcw [value_37E]
+	fldcw [value_37A]
+
     call setup_stack_chk
 
     push esp ; kernel esp uebergeben

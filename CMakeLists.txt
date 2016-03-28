@@ -46,7 +46,7 @@ endif()
 enable_language(ASM_NASM)
 add_executable(kernel ${SOURCES} ${ARCH_ASM} ${ARCH_SOURCES} ${HEADERS} ${ARCH_HEADERS})
 
-target_link_libraries(kernel dayos)
+target_link_libraries(kernel dayos m)
 include_directories(${LIBDAYOS_INCLUDE})
 
 #set(CMAKE_CXX_LINK_EXECUTABLE "")
