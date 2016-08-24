@@ -1,11 +1,11 @@
 #include <types.h>
-#include <message.h>
+#include <dayos/message.h>
 #include <debug.h>
 #include <video.h>
 #include <heap.h>
 #include <string.h>
 #include <ramdisk.h>
-#include <syscall.h>
+#include <dayos/syscall.h>
 #include <sleep.h>
 
 typedef struct service

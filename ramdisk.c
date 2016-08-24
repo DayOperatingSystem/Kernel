@@ -3,12 +3,12 @@
 #include <debug.h>
 #include <string.h>
 #include <video.h>
-#include <message.h>
-#include <dayos.h>
-#include <driver.h>
+#include <dayos/message.h>
+#include <dayos/dayos.h>
+#include <dayos/driver.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <vfs.h>
+#include <dayos/vfs.h>
 #include <stdlib.h>
 
 // RAM-Disk ist eine tar-file
@@ -226,16 +226,16 @@ void ramdisk_process()
 
 		switch(msg.signal)
 		{
-			case FS_SIGNAL_OPEN:
+			case VFS_SIGNAL_OPEN:
 				if(rq->mode != VFS_MODE_RO || !GetRamDiskFileRel(rq->path))
 					msg.signal = SIGNAL_FAIL;
 				else
 					msg.signal = SIGNAL_OK;
-				
+
 				send_message(&msg, msg.sender);
 			break;
 			
-			case FS_SIGNAL_STAT: {
+			case VFS_SIGNAL_STAT: {
 				struct stat* stat = (struct stat*) &msg.message;
 				tar_header_t* f = GetRamDiskFileRel(rq->path);
 				
@@ -261,12 +261,12 @@ void ramdisk_process()
 			}
 			break;
 			
-			case FS_SIGNAL_READ: {
+			case VFS_SIGNAL_READ: {
 				tar_header_t* f = GetRamDiskFileRel(rq->path);
 				char* data = ((char*) f + 512);
 				size_t fsz = get_size(f->size);
 				size_t sz = fsz;
-				if(msg.size < sz) sz = msg.size;			
+				if(rq->size < sz) sz = rq->size;
 				
 				if(!f || rq->offset + sz > fsz)
 				{
@@ -279,7 +279,7 @@ void ramdisk_process()
 			}
 			break;
 			
-			case FS_SIGNAL_OPEN_DIR: {
+			case VFS_SIGNAL_OPEN_DIR: {
 				file = GetRamDiskFileRel(rq->path);
 				
 				if(!file)

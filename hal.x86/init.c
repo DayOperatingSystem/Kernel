@@ -8,7 +8,7 @@
 #include <heap.h>
 #include <ramdisk.h>
 #include <multitasking.h>
-#include <driver.h>
+#include <dayos/driver.h>
 #include <string.h>
 
 extern void InitBootDrivers();

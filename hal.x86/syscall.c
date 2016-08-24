@@ -1,8 +1,8 @@
-#include <syscall.h>
+#include <dayos/syscall.h>
 #include <multitasking.h>
 #include <debug.h>
 #include <video.h>
-#include <message.h>
+#include <dayos/message.h>
 #include <vmm.h>
 #include <idt.h>
 #include <elf.h>

@@ -3,7 +3,7 @@
 #include <debug.h>
 #include <ports.h>
 #include <multitasking.h>
-#include <syscall.h>
+#include <dayos/syscall.h>
 #include <video.h>
 #include "include/ksyscall.h"
 
