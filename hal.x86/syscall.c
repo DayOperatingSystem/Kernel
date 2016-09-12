@@ -200,6 +200,7 @@ struct cpu* Syscall(struct cpu* cpu_old)
 				proc->state->ecx = proc->state->eip;
 				proc->state->eip = proc->signal;
 				proc->state->eax = cpu_old->ebx;
+				cpu_old = Schedule(cpu_old);
 			}
 		}
 	}
