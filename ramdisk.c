@@ -280,6 +280,15 @@ void ramdisk_process()
 			break;
 			
 			case VFS_SIGNAL_OPEN_DIR: {
+				// Prepare filename for being a directory
+				size_t pathlen = strlen(rq->path);
+				
+				if(rq->path[pathlen-1] != '/' && pathlen < sizeof(rq->path) - 1)
+				{
+					rq->path[pathlen] = '/';
+					rq->path[pathlen+1] = 0;
+				}
+				
 				file = GetRamDiskFileRel(rq->path);
 				
 				if(!file)
@@ -291,7 +300,7 @@ void ramdisk_process()
 				
 				// Find first entry of the directory
 				int i;
-				size_t dirname_len = strlen(files[i]->filename);
+				size_t dirname_len = strlen(file->filename);
 				for(i = 0; i < filecount; i++)
 				{
 					DebugPrintf("Comparing %s to %s\n", files[i]->filename + 1, rq->path);
@@ -302,13 +311,12 @@ void ramdisk_process()
 					}
 				}
 			
-				vfile->offset = i;
-				
-				msg.size = 0;
+				vfile->child_nid = i;
+				strcpy(vfile->path, files[i-1]->filename + 1);
+
+				msg.size = sizeof(struct vfs_file);
 				msg.signal = SIGNAL_OK;
 				send_message(&msg, msg.sender);
-				
-				strcpy(vfile->path, rq->path);
 			}
 			break;
 			
@@ -321,22 +329,29 @@ void ramdisk_process()
 					break;
 				}
 				
-				file = files[rq->param];
-				
-				size_t curfile_len = strlen(file->filename);
+				size_t cur_item = rq->param;
+				size_t curfile_len;
 				size_t len = strlen(rq->path) + 1;
-				const char* last_slash = strchr(&file->filename[len], '/');
-
-				if(len >= curfile_len
-				   || (last_slash && last_slash != &file->filename[curfile_len-1]))
+				const char* last_slash;
+				
+				for(cur_item = rq->param; cur_item < filecount && last_slash && last_slash != &file->filename[curfile_len - 1]; cur_item++)
+				{
+					file = files[cur_item];
+					curfile_len = strlen(file->filename);
+					last_slash = strchr(&file->filename[len], '/');
+				}
+				
+				if(cur_item >= filecount)
 				{
 					msg.signal = SIGNAL_FAIL;
 					send_message(&msg, msg.sender);
 					break;
-				
 				}
 				
-				vfile->nid = rq->param;
+				vfile->nid = cur_item;
+				vfile->child_nid = cur_item + 1;
+				debug_printf("%d\n", cur_item + 1);
+				
 				strcpy(vfile->path, file->filename);
 				msg.signal = SIGNAL_OK;
 				send_message(&msg, msg.sender);
